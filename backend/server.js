@@ -21,10 +21,6 @@ const wss = new WebSocketServer({ server });
 // Store message statuses in memory (in production, use a database)
 const messageStatuses = new Map();
 
-// Store pending challan data for two-step messaging
-// Key: phone number (without +), Value: { challanData, messageId, timestamp }
-const pendingChallans = new Map();
-
 // WebSocket connection handler
 wss.on('connection', (ws) => {
     console.log('Client connected to WebSocket');
@@ -113,62 +109,10 @@ app.post('/webhook', (req, res) => {
                             });
                         }
 
-                        // Handle incoming messages - AUTO-SEND CHALLAN DETAILS
+                        // Handle incoming messages (optional - for future use)
                         if (value.messages) {
-                            value.messages.forEach(async (message) => {
-                                console.log('Received incoming message:', message);
-
-                                // Get sender's phone number
-                                const senderPhone = message.from;
-                                console.log(`Message from: ${senderPhone}`);
-
-                                // Check if we have a pending challan for this number
-                                if (pendingChallans.has(senderPhone)) {
-                                    const pendingData = pendingChallans.get(senderPhone);
-                                    console.log(`Found pending challan for ${senderPhone}, auto-sending details...`);
-
-                                    // Send notification to frontend that user replied
-                                    broadcastStatusUpdate(pendingData.messageId, 'replied');
-
-                                    // Auto-send the detailed challan message
-                                    try {
-                                        const axios = await import('axios');
-                                        const response = await axios.default.post(
-                                            `https://graph.facebook.com/v22.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
-                                            {
-                                                messaging_product: 'whatsapp',
-                                                to: senderPhone,
-                                                type: 'text',
-                                                text: { body: pendingData.challanData }
-                                            },
-                                            {
-                                                headers: {
-                                                    'Authorization': `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            }
-                                        );
-
-                                        console.log(`Challan details sent to ${senderPhone}:`, response.data);
-
-                                        // Update status to 'detailed_sent'
-                                        const detailedMessageId = response.data.messages?.[0]?.id;
-                                        if (detailedMessageId) {
-                                            messageStatuses.set(detailedMessageId, 'detailed_sent');
-                                            broadcastStatusUpdate(pendingData.messageId, 'detailed_sent');
-                                        }
-
-                                        // Remove from pending queue
-                                        pendingChallans.delete(senderPhone);
-                                        console.log(`Removed ${senderPhone} from pending queue`);
-
-                                    } catch (error) {
-                                        console.error(`Error sending detailed message to ${senderPhone}:`, error);
-                                        broadcastStatusUpdate(pendingData.messageId, 'error');
-                                    }
-                                } else {
-                                    console.log(`No pending challan for ${senderPhone}`);
-                                }
+                            value.messages.forEach((message) => {
+                                console.log('Received message:', message);
                             });
                         }
                     }
@@ -195,42 +139,6 @@ app.get('/api/status/:messageId', (req, res) => {
 app.get('/api/statuses', (req, res) => {
     const allStatuses = Object.fromEntries(messageStatuses);
     res.json(allStatuses);
-});
-
-// API endpoint to register a pending challan (for two-step messaging)
-app.post('/api/pending-challan', (req, res) => {
-    try {
-        const { phoneNumber, challanData, messageId } = req.body;
-
-        if (!phoneNumber || !challanData || !messageId) {
-            return res.status(400).json({
-                error: 'Missing required fields: phoneNumber, challanData, messageId'
-            });
-        }
-
-        // Store pending challan
-        pendingChallans.set(phoneNumber, {
-            challanData,
-            messageId,
-            timestamp: Date.now()
-        });
-
-        console.log(`Registered pending challan for ${phoneNumber}`);
-        res.json({
-            success: true,
-            message: 'Pending challan registered',
-            phoneNumber
-        });
-    } catch (error) {
-        console.error('Error registering pending challan:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// API endpoint to get pending challans (for debugging)
-app.get('/api/pending-challans', (req, res) => {
-    const pending = Object.fromEntries(pendingChallans);
-    res.json({ count: pendingChallans.size, pending });
 });
 
 // Start server

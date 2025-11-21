@@ -13,7 +13,7 @@ interface ExtractedChallan {
   data: ChallanData
 }
 
-type MessageStatus = 'idle' | 'sending' | 'sent' | 'waiting_reply' | 'replied' | 'detailed_sent' | 'delivered' | 'read' | 'error'
+type MessageStatus = 'idle' | 'sending' | 'sent' | 'delivered' | 'read' | 'error'
 
 function App() {
   const [fileName, setFileName] = useState<string | null>(null)
@@ -29,7 +29,6 @@ function App() {
   const ACCESS_TOKEN = import.meta.env.VITE_WHATSAPP_ACCESS_TOKEN || ''
   const TEMPLATE_NAME = import.meta.env.VITE_WHATSAPP_TEMPLATE_NAME || 'hello_world'
   const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:3000'
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'
 
   // WebSocket connection for real-time status updates
   useEffect(() => {
@@ -88,13 +87,7 @@ function App() {
       case 'sending':
         return 'Sending'
       case 'sent':
-        return 'Template Sent'
-      case 'waiting_reply':
-        return 'Waiting for Reply'
-      case 'replied':
-        return 'User Replied'
-      case 'detailed_sent':
-        return 'Details Sent'
+        return 'Sent'
       case 'delivered':
         return 'Delivered'
       case 'read':
@@ -121,8 +114,8 @@ function App() {
       const vehicle = String(challan.data['Vehicle Number'] || challan.data['Vehicle No'] || challan.data['Registration No'] || 'N/A')
 
       // Use tick (✓) for success and cross (✗) for failure/not done
-      const sentStatus = (status === 'sent' || status === 'waiting_reply' || status === 'replied' || status === 'detailed_sent' || status === 'delivered' || status === 'read') ? '✓' : '✗'
-      const deliveredStatus = (status === 'detailed_sent' || status === 'delivered' || status === 'read') ? '✓' : '✗'
+      const sentStatus = (status === 'sent' || status === 'delivered' || status === 'read') ? '✓' : '✗'
+      const deliveredStatus = (status === 'delivered' || status === 'read') ? '✓' : '✗'
       const readStatus = status === 'read' ? '✓' : '✗'
 
       return {
@@ -250,7 +243,7 @@ Thank you.
     setMessageStatuses(prev => ({ ...prev, [index]: 'sending' }))
 
     try {
-      // STEP 1: Send hello_world template to open conversation
+      // Using WhatsApp Template API
       const response = await axios.post(
         `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
         {
@@ -272,7 +265,7 @@ Thank you.
         }
       )
 
-      console.log(`WhatsApp template sent to ${mobile}:`, response.data)
+      console.log(`WhatsApp message sent to ${mobile}:`, response.data)
 
       // Store the message ID for tracking
       const messageId = response.data.messages?.[0]?.id
@@ -281,31 +274,43 @@ Thank you.
         console.log(`Stored message ID ${messageId} for index ${index}`)
       }
 
-      // STEP 2: Register pending challan on backend (will auto-send when user replies)
-      const challanText = formatChallanMessage(challanData)
-      try {
-        await axios.post(`${BACKEND_URL}/api/pending-challan`, {
-          phoneNumber: mobile,
-          challanData: challanText,
-          messageId: messageId
-        })
-        console.log(`Registered pending challan for ${mobile}`)
-      } catch (regError) {
-        console.error('Error registering pending challan:', regError)
-      }
-
-      // Update status to "waiting for reply"
-      setMessageStatuses(prev => ({ ...prev, [index]: 'waiting_reply' }))
-
+      setMessageStatuses(prev => ({ ...prev, [index]: 'sent' }))
     } catch (error: unknown) {
-      console.error(`Error sending WhatsApp template to ${mobile}:`, error)
-      setMessageStatuses(prev => ({ ...prev, [index]: 'error' }))
+      console.error(`Error sending WhatsApp message to ${mobile}:`, error)
 
-      if (axios.isAxiosError(error) && error.response?.data) {
-        const errorData = error.response.data
-        console.error('WhatsApp API Error:', errorData)
-        alert(`Failed to send message to ${mobile}.\n\nError: ${errorData.error?.message || 'Unknown error'}\n\nCheck console for details.`)
-      } else {
+      // If template fails, try sending as regular text message
+      try {
+        const messageText = formatChallanMessage(challanData)
+        const response = await axios.post(
+          `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
+          {
+            messaging_product: 'whatsapp',
+            to: mobile,
+            type: 'text',
+            text: {
+              body: messageText
+            }
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${ACCESS_TOKEN}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        console.log(`WhatsApp message sent to ${mobile} (text):`, response.data)
+
+        // Store the message ID for tracking
+        const messageId = response.data.messages?.[0]?.id
+        if (messageId) {
+          setMessageIds(prev => ({ ...prev, [index]: messageId }))
+          console.log(`Stored message ID ${messageId} for index ${index}`)
+        }
+
+        setMessageStatuses(prev => ({ ...prev, [index]: 'sent' }))
+      } catch (textError) {
+        console.error(`Error sending text message to ${mobile}:`, textError)
+        setMessageStatuses(prev => ({ ...prev, [index]: 'error' }))
         alert(`Failed to send message to ${mobile}. Check console for details.`)
       }
     }
@@ -510,14 +515,11 @@ Thank you.
                       <button
                         className={`send-btn status-${status}`}
                         onClick={() => sendWhatsAppMessage(challan.mobile, challan.data, index)}
-                        disabled={status === 'sending' || status === 'waiting_reply' || status === 'replied' || status === 'detailed_sent' || status === 'delivered' || status === 'read'}
+                        disabled={status === 'sending' || status === 'sent' || status === 'delivered' || status === 'read'}
                       >
                         {status === 'idle' && 'Send'}
                         {status === 'sending' && 'Sending...'}
-                        {status === 'sent' && 'Template Sent'}
-                        {status === 'waiting_reply' && 'Waiting...'}
-                        {status === 'replied' && 'User Replied'}
-                        {status === 'detailed_sent' && 'Details Sent ✓'}
+                        {status === 'sent' && 'Sent'}
                         {status === 'delivered' && 'Delivered'}
                         {status === 'read' && 'Read'}
                         {status === 'error' && 'Retry'}
