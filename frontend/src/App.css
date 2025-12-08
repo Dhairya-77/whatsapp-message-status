@@ -1,0 +1,481 @@
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.landing-page {
+  width: 100%;
+  max-width: 800px;
+}
+
+.content-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin: 0 0 2.5rem 0;
+  font-size: 1rem;
+}
+
+.upload-area {
+  margin: 2rem 0;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  border: 3px dashed #667eea;
+  border-radius: 15px;
+  background: #f8f9ff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 200px;
+}
+
+.file-label:hover:not(.disabled) {
+  border-color: #764ba2;
+  background: #f0f2ff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.file-label.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.file-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #333;
+  word-break: break-all;
+  text-align: center;
+  max-width: 100%;
+}
+
+.file-hint {
+  font-size: 0.875rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+.reset-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.reset-btn:hover {
+  background: #ff5252;
+  transform: scale(1.05);
+}
+
+.info-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 2px solid #eee;
+  text-align: center;
+}
+
+.info-section h3 {
+  font-size: 1.25rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+}
+
+.formats {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.format-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+.note {
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+.note code {
+  background: #f5f5f5;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #667eea;
+}
+
+/* Challan Results Section */
+.challan-results {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #eee;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.results-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.results-header h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+  font-weight: 600;
+}
+
+.send-all-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.send-all-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.send-all-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.download-report-btn {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+}
+
+.download-report-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+}
+
+.download-report-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.challan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.challan-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.challan-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.challan-list::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+.challan-list::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
+
+.challan-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background: #f8f9ff;
+  border-radius: 12px;
+  border: 2px solid #e0e4ff;
+  transition: all 0.3s ease;
+  gap: 1rem;
+}
+
+.challan-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.challan-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
+
+.status-chip.status-idle {
+  background: #f0f2ff;
+  color: #667eea;
+}
+
+.status-chip.status-sending {
+  background: #fff4e5;
+  color: #ffa726;
+}
+
+.status-chip.status-sent {
+  background: #e6f7ff;
+  color: #2196f3;
+}
+
+.status-chip.status-delivered {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.status-chip.status-read {
+  background: #f1f8e9;
+  color: #558b2f;
+}
+
+.status-chip.status-error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.challan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.challan-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.challan-mobile {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+}
+
+.challan-amount {
+  color: #ff6b6b;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.send-btn {
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.send-btn.status-idle {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.send-btn.status-idle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn.status-sending {
+  background: #ffa726;
+  color: white;
+  cursor: not-allowed;
+}
+
+.send-btn.status-success {
+  background: #4caf50;
+  color: white;
+  cursor: default;
+}
+
+.send-btn.status-error {
+  background: #ff6b6b;
+  color: white;
+}
+
+.send-btn.status-error:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+}
+
+.send-btn:disabled {
+  opacity: 0.8;
+}
+
+.no-results {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #fff3cd;
+  border-radius: 12px;
+  border: 2px solid #ffc107;
+  text-align: center;
+}
+
+.no-results p {
+  margin: 0.5rem 0;
+  color: #856404;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .landing-page {
+    max-width: 100%;
+  }
+
+  .content-card {
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .file-label {
+    padding: 2rem 1.5rem;
+    min-height: 180px;
+  }
+
+  .file-icon {
+    font-size: 2.5rem;
+  }
+
+  .results-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .results-header h3 {
+    text-align: center;
+  }
+
+  .send-all-btn {
+    width: 100%;
+  }
+
+  .challan-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .send-btn {
+    width: 100%;
+  }
+
+  .challan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
